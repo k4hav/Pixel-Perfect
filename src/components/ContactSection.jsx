@@ -76,7 +76,7 @@ export default function ContactSection() {
             fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 800,
             color: 'var(--text-primary)', marginBottom: '14px', lineHeight: 1.2,
           }}>
-            Contact <span className="gradient-text">ƘҽՏհɑѵ</span>
+            Contact <span className="gradient-text">Admin</span>
           </h2>
           <p style={{ fontSize: '16px', color: 'var(--text-secondary)', maxWidth: '480px', margin: '0 auto', lineHeight: 1.7 }}>
             Found a bug? Have a suggestion? Want to collaborate?
@@ -130,11 +130,8 @@ export default function ContactSection() {
               </div>
 
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {s.name}
-                </div>
-                <div style={{ fontSize: '12px', color: s.color, fontWeight: 600, opacity: 0.9 }}>
-                  {s.handle}
                 </div>
               </div>
 
