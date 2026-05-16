@@ -11,6 +11,7 @@ import ToolPanel from '@/components/ToolPanel';
 import ResultPanel from '@/components/ResultPanel';
 import HowItWorks from '@/components/HowItWorks';
 import BatchProcessor from '@/components/BatchProcessor';
+import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { processImage } from '@/lib/imageProcessor';
 import SplineBackground from '@/components/SplineBackground';
@@ -136,6 +137,7 @@ export default function Home() {
 
         <HowItWorks />
         <BatchProcessor />
+        <ContactSection />
         <Footer />
       </main>
     </>
