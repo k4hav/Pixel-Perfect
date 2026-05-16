@@ -13,7 +13,7 @@ const TABS = [
 ];
 const UNITS = ['px', 'cm', 'mm', 'in'];
 const DPI_PRESETS = [72, 96, 150, 300, 600];
-const FORMAT_OPTIONS = ['JPEG', 'PNG', 'WEBP', 'PDF'];
+const FORMAT_OPTIONS = ['JPEG', 'JPG', 'PNG', 'WEBP', 'PDF'];
 
 /* ─── Shared styles (defined OUTSIDE component so they're stable) ─── */
 const inputBase = {
@@ -70,16 +70,17 @@ function RangeSlider({ label, value, onChange, min, max, unit }) {
   );
 }
 
-/* ─── Number input — uses LOCAL state while typing, commits on blur ─── */
-function NumInput({ label, value, onChange, step = 1, suffix }) {
-  // Keep a local string the user is actively typing; only convert on blur
-  const [localVal, setLocalVal] = useState(String(value ?? ''));
+/* ─── Number input — dumb display, parent owns the display string ─── */
+// displayValue = the string shown (raw typed or converted)
+// onCommit(rawString) = called on blur/enter with the raw typed string
+function NumInput({ label, displayValue, onCommit, step = 1, suffix }) {
+  const [localVal, setLocalVal] = useState(String(displayValue ?? ''));
   const [focused, setFocused] = useState(false);
 
-  // When external value changes (e.g. aspect ratio update), sync if not focused
+  // Sync when parent updates display (unit switch, aspect ratio, etc.)
   useEffect(() => {
-    if (!focused) setLocalVal(String(value ?? ''));
-  }, [value, focused]);
+    if (!focused) setLocalVal(String(displayValue ?? ''));
+  }, [displayValue, focused]);
 
   return (
     <div style={{ flex: 1 }}>
@@ -88,21 +89,21 @@ function NumInput({ label, value, onChange, step = 1, suffix }) {
         <input
           type="number"
           step={step}
-          value={focused ? localVal : (value ?? '')}
+          value={focused ? localVal : (displayValue ?? '')}
           onChange={e => setLocalVal(e.target.value)}
           onFocus={e => {
             setFocused(true);
-            setLocalVal(String(value ?? ''));
+            setLocalVal(String(displayValue ?? ''));
             setTimeout(() => e.target.select(), 0);
             focusIn(e);
           }}
           onBlur={e => {
             setFocused(false);
-            onChange(e.target.value);  // commit on blur
+            onCommit(e.target.value); // parent stores raw string
             focusOut(e);
           }}
           onKeyDown={e => {
-            if (e.key === 'Enter') { e.target.blur(); }
+            if (e.key === 'Enter') e.target.blur();
           }}
           style={inputBase}
         />
@@ -123,6 +124,8 @@ function NumInput({ label, value, onChange, step = 1, suffix }) {
 export default function ToolPanel({ image, onProcess, processing }) {
   const [activeTab, setActiveTab] = useState('resize');
   const [unit, setUnit] = useState('px');
+  const [displayW, setDisplayW] = useState('');
+  const [displayH, setDisplayH] = useState('');
   const [settings, setSettings] = useState({
     width: '', height: '', maintainAspect: false, dpi: 96, customDpi: '',
     quality: 85, targetSizeKB: '', targetSizeUnit: 'KB',
@@ -130,8 +133,13 @@ export default function ToolPanel({ image, onProcess, processing }) {
     sharpness: 0, saturation: 100, rotation: 0, flipH: false, flipV: false,
   });
 
+  // When image loads, set initial px & display values
   useEffect(() => {
-    if (image) setSettings(s => ({ ...s, width: image.width || '', height: image.height || '' }));
+    if (image) {
+      setSettings(s => ({ ...s, width: image.width || '', height: image.height || '' }));
+      setDisplayW(String(image.width || ''));
+      setDisplayH(String(image.height || ''));
+    }
   }, [image]);
 
   const toUnit = useCallback((px) => {
@@ -155,14 +163,29 @@ export default function ToolPanel({ image, onProcess, processing }) {
     }
   }, [unit, settings.dpi]);
 
+  // When unit or DPI changes, recompute display values from stored px
+  useEffect(() => {
+    setDisplayW(unit === 'px' ? String(settings.width) : String(toUnit(settings.width)));
+    setDisplayH(unit === 'px' ? String(settings.height) : String(toUnit(settings.height)));
+  }, [unit, settings.dpi]); // eslint-disable-line
+
   const update = useCallback((key, val) => setSettings(s => {
     const next = { ...s, [key]: val };
-    if (key === 'width' && s.maintainAspect && image && image.width)
-      next.height = Math.round(val / (image.width / image.height));
-    if (key === 'height' && s.maintainAspect && image && image.height)
-      next.width = Math.round(val * (image.width / image.height));
+    if (key === 'width' && s.maintainAspect && image && image.width) {
+      const newH = Math.round(val / (image.width / image.height));
+      next.height = newH;
+      // Update height display too
+      const displayH = unit === 'px' ? String(newH) : String(toUnit(newH));
+      setDisplayH(displayH);
+    }
+    if (key === 'height' && s.maintainAspect && image && image.height) {
+      const newW = Math.round(val * (image.width / image.height));
+      next.width = newW;
+      const displayW = unit === 'px' ? String(newW) : String(toUnit(newW));
+      setDisplayW(displayW);
+    }
     return next;
-  }), [image]);
+  }), [image, unit, settings.dpi]); // eslint-disable-line
 
   /* ─ RESIZE tab ─ */
   const renderResize = () => (
@@ -190,8 +213,11 @@ export default function ToolPanel({ image, onProcess, processing }) {
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
         <NumInput
           label="Width"
-          value={unit === 'px' ? settings.width : toUnit(settings.width)}
-          onChange={val => update('width', fromUnit(val))}
+          displayValue={displayW}
+          onCommit={val => {
+            setDisplayW(val); // keep exactly what user typed
+            update('width', fromUnit(val));
+          }}
           step={unit === 'px' ? 1 : 0.01}
           suffix={unit}
         />
@@ -209,8 +235,11 @@ export default function ToolPanel({ image, onProcess, processing }) {
         </motion.button>
         <NumInput
           label="Height"
-          value={unit === 'px' ? settings.height : toUnit(settings.height)}
-          onChange={val => update('height', fromUnit(val))}
+          displayValue={displayH}
+          onCommit={val => {
+            setDisplayH(val); // keep exactly what user typed
+            update('height', fromUnit(val));
+          }}
           step={unit === 'px' ? 1 : 0.01}
           suffix={unit}
         />
@@ -222,12 +251,12 @@ export default function ToolPanel({ image, onProcess, processing }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
           {DPI_PRESETS.map(d => (
             <Pill key={d} label={String(d)} active={settings.dpi === d && !settings.customDpi}
-              onClick={() => update('dpi', d)} />
+              onClick={() => { update('dpi', d); setSettings(s => ({ ...s, customDpi: '' })); }} />
           ))}
         </div>
         <NumInput
-          value={settings.customDpi}
-          onChange={val => { update('customDpi', val); if (val) update('dpi', Number(val)); }}
+          displayValue={settings.customDpi}
+          onCommit={val => { update('customDpi', val); if (val) update('dpi', Number(val)); }}
           suffix="dpi"
           step={1}
         />

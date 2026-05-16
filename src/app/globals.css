@@ -529,3 +529,72 @@ input[type="range"]:hover { background: rgba(255,255,255,0.16); }
   background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
   pointer-events: none;
 }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — Mobile First
+═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Navbar */
+  nav > div { padding: 0 16px !important; }
+
+  /* Hero section */
+  .hero-section { padding-top: 80px !important; min-height: 70vh !important; }
+  .hero-title { font-size: clamp(28px, 8vw, 52px) !important; line-height: 1.15 !important; }
+  .hero-subtitle { font-size: 15px !important; }
+  .hero-badges { flex-wrap: wrap; gap: 8px !important; justify-content: center !important; }
+
+  /* Upload zone */
+  .upload-zone { padding: 32px 20px !important; min-height: 180px !important; }
+
+  /* Tool Panel tabs — scroll horizontally on small screens */
+  .tab-row { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+  .tab-row::-webkit-scrollbar { display: none; }
+  .tab-btn { white-space: nowrap; min-width: 80px; }
+
+  /* Width + Height inputs — stack vertically on very small screens */
+  .dimension-row { flex-direction: column !important; gap: 12px !important; }
+
+  /* Unit switcher pills — fit in one row */
+  .unit-row { gap: 4px !important; }
+  .unit-row button { padding: 7px 6px !important; font-size: 11px !important; }
+
+  /* Result panel — single column */
+  .result-grid { flex-direction: column !important; }
+
+  /* How it works cards — single column */
+  .how-grid { grid-template-columns: 1fr !important; }
+
+  /* Footer — stack vertically */
+  .footer-links { flex-direction: column; gap: 12px !important; text-align: center; }
+
+  /* Generic: constrain all containers */
+  [style*="maxWidth: '780px'"],
+  [style*="max-width: 780px"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Buttons full-width on mobile */
+  .btn-mobile-full { width: 100% !important; justify-content: center !important; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: clamp(24px, 9vw, 36px) !important; }
+  .hero-stats { flex-direction: column; gap: 12px !important; }
+
+  /* DPI presets — smaller pills */
+  .dpi-row button { padding: 5px 10px !important; font-size: 11px !important; }
+
+  /* Format selector — 2 columns */
+  .format-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Glass cards — reduce padding */
+  .glass-card { padding: 16px !important; border-radius: 16px !important; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablet adjustments */
+  .hero-title { font-size: clamp(36px, 5vw, 56px) !important; }
+  [style*="maxWidth: '780px'"] { padding: 0 24px !important; }
+}
