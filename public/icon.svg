@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0533"/>
+      <stop offset="100%" style="stop-color:#0d001f"/>
+    </linearGradient>
+    <linearGradient id="kg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c084fc"/>
+      <stop offset="50%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
+
+  <!-- Subtle inner border -->
+  <rect width="32" height="32" rx="8" fill="none" stroke="rgba(167,139,250,0.25)" stroke-width="1"/>
+
+  <!-- Glow orb behind K -->
+  <ellipse cx="16" cy="16" rx="10" ry="10" fill="#7c3aed" opacity="0.15"/>
+
+  <!-- K letter — bold, centered, with glow -->
+  <text
+    x="16" y="22"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-size="20"
+    font-weight="900"
+    text-anchor="middle"
+    fill="url(#kg)"
+    filter="url(#glow)"
+    letter-spacing="-1"
+  >K</text>
+</svg>

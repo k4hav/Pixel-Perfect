@@ -4,6 +4,13 @@ export const metadata = {
   title: "PixelPerfect — AI Image Optimizer & Editor",
   description: "Resize, compress, convert & optimize images for Aadhaar, PAN, Passport, government forms, JEE/NEET, LinkedIn, and more. Free, fast, and AI-powered.",
   keywords: "image resize, compress image, convert image, passport photo, aadhaar photo resize, pan card photo, image optimizer, photo compressor",
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     title: "PixelPerfect — AI Image Optimizer",
     description: "Make any image upload-ready in seconds. No signup required.",
